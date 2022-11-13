@@ -2,14 +2,14 @@ import os
 import cv2
 
 def datas_handle():
-    vid_cap = cv2.VideoCapture('/Users/lujingyuan/Desktop/fish01/Fish01.mp4')
+    vid_cap = cv2.VideoCapture('Fish01.mp4')
     fps = vid_cap.get(cv2.CAP_PROP_FPS)
     print(fps)
     datas = {}
     count = 0 #秒數
     filesortNum = []
     folderName = ""
-    folderPath = "/Users/lujingyuan/Desktop/fish01/labels"
+    folderPath = "labels"
     listdir = os.listdir(folderPath)
 
     for l in listdir:
