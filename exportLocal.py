@@ -1,10 +1,13 @@
 import os
 import cv2
 
+# 資料處理輸出時間檔案輸出秒數集時間以及座標
+# 輸出格式為（'時間'：['0','x','y','h','w']）第一項0無意義
 def datas_handle():
-    vid_cap = cv2.VideoCapture('Fish01.mp4')
+#--------------開啟影片檔並求出fps------------------#
+    vid_cap = cv2.VideoCapture('Fish01.mp4') 
     fps = vid_cap.get(cv2.CAP_PROP_FPS)
-    print(fps)
+#------------------------------------------------#
     datas = {}
     count = 0 #秒數
     filesortNum = []
