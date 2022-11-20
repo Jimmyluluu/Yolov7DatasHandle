@@ -1,18 +1,20 @@
 import os
+import random
 import cv2
 
 # 資料處理輸出時間檔案輸出秒數集時間以及座標
 # 輸出格式為（'時間'：['0','x','y','h','w']）第一項0無意義
+
 def datas_handle():
 #--------------開啟影片檔並求出fps------------------#
-    vid_cap = cv2.VideoCapture('Fish01.mp4') 
+    vid_cap = cv2.VideoCapture('drop.mp4') 
     fps = vid_cap.get(cv2.CAP_PROP_FPS)
 #------------------------------------------------#
     datas = {}
     count = 0 #秒數
     filesortNum = []
     folderName = ""
-    folderPath = "labels"
+    folderPath = "drop"
     listdir = os.listdir(folderPath)
 
     for l in listdir:
@@ -44,5 +46,6 @@ def anxiety_status(datas):
 
 if __name__ == '__main__':
     datas = datas_handle()
-    # print(datas)
-    anxiety_status(datas)
+    for data in datas:
+        print(data,end=":")
+        print(datas[data])
