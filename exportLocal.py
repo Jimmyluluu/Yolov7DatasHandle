@@ -1,4 +1,4 @@
-import os, random, cv2, click, argparse
+import os, random, cv2, argparse
 # 資料處理輸出時間檔案輸出秒數集時間以及座標
 # 輸出格式為（'時間'：['0','x','y','h','w']）第一項0無意義
 
@@ -37,8 +37,9 @@ def datas_handle(mp4Name, coordinateFolder):
 
 def anxiety_status(datas):
     for data in datas:
-        print(float(data[:-1]))
-
+        if float(datas[data][0][2]) > 0.75:
+            time = data.split(".")[0]
+            print(str(data) + ":" + "沉底")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -49,6 +50,4 @@ if __name__ == '__main__':
     coordinateFolder = args.coordinateFolder
 
     datas = datas_handle(mp4Name, coordinateFolder)
-    for data in datas:
-        print(data,end=":")
-        print(datas[data])
+    anxiety_status(datas)
