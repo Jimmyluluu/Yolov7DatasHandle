@@ -4,11 +4,12 @@
 import os, random, cv2, argparse, sys, PyQt5
 import sys
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton, QLabel
 from PyQt5.QtGui import QIcon
 
 # 選擇檔案的頁面加入頁面
 class App(QWidget):
+    videoName = ''
 
     def __init__(self):
         super().__init__()
@@ -30,19 +31,34 @@ class App(QWidget):
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.mybutton = QPushButton('button', self)
-        self.mybutton.move(60, 50)
-        self.mybutton.clicked.connect(self.openFileNameDialog)
+
+        self.buttonOne = QPushButton('button', self)
+        self.buttonOne.move(60, 50)
+
+        self.buttonTwo = QPushButton('button', self)
+        self.buttonTwo.move(100, 50)
+        
+        self.labelOne = QLabel("檔案為：", self)
+        self.labelOne.setGeometry(60, 90, 300, 50)
+        self.labelOne.move(60, 90)
+
+        self.buttonOne.clicked.connect(self.openFileNameDialog)
+        self.buttonTwo.clicked.connect(self.check)
 
         self.show()
+
+    def check(self):
+        self.labelOne.setText(self.videoName)
+        self.labelOne.setGeometry(60, 90, 300, 100)
+        print(self.labelOne.text())
 
     def openFileNameDialog(self):    
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        videoName, _ = QFileDialog.getOpenFileName(self,"選擇影片()", "","All Files (*);;Python Files (*.py)", options=options)
-        if videoName:
-            print(videoName)
-            print("fileName")
+        Name, _ = QFileDialog.getOpenFileName(self,"選擇影片()", "","All Files (*);;Python Files (*.py)", options=options)
+        self.videoName = Name
+        if Name:
+            print(Name)
 
 
     # def openFileNamesDialog(self):    
@@ -52,50 +68,45 @@ class App(QWidget):
     #     if files:
     #         print(files)
     #         print("file")
-            
-    def close_window(self):
-    	self.close()
+    def datas_handle(mp4Name, coordinateFolder):
+    #--------------開啟影片檔並求出fps------------------#
+        vid_cap = cv2.VideoCapture(mp4Name) 
+        fps = vid_cap.get(cv2.CAP_PROP_FPS)
+    #------------------------------------------------#
+        datas = {}
+        count = 0 #秒數
+        filesortNum = []
+        folderName = ""
+        folderPath = coordinateFolder
+        listdir = os.listdir(folderPath)
 
+        for l in listdir:
+            filesortNum.append(int(l.split('_')[1].split('.')[0]))
+            folderName = l.split('_')[0]
+        filesortNum = (sorted(filesortNum))
 
-def datas_handle(mp4Name, coordinateFolder):
-#--------------開啟影片檔並求出fps------------------#
-    vid_cap = cv2.VideoCapture(mp4Name) 
-    fps = vid_cap.get(cv2.CAP_PROP_FPS)
-#------------------------------------------------#
-    datas = {}
-    count = 0 #秒數
-    filesortNum = []
-    folderName = ""
-    folderPath = coordinateFolder
-    listdir = os.listdir(folderPath)
+        for file in filesortNum:
+            text = []
+            fileName = folderName + "_" + str(file) + ".txt"
+            filepath = os.path.join(folderPath, fileName)
 
-    for l in listdir:
-        filesortNum.append(int(l.split('_')[1].split('.')[0]))
-        folderName = l.split('_')[0]
-    filesortNum = (sorted(filesortNum))
+            f = open(filepath)
+            for line in f:
+                line = line.split(' ')
+                if len(line) > 4:
+                    line[4] = line[4].replace("\n", "")
+                text.append(line)
+            datas.update({str(round(file/fps,2)) + "s": text})
+            count = count + 1
+            f.close
+        return datas #輸出資料夾
 
-    for file in filesortNum:
-        text = []
-        fileName = folderName + "_" + str(file) + ".txt"
-        filepath = os.path.join(folderPath, fileName)
-
-        f = open(filepath)
-        for line in f:
-            line = line.split(' ')
-            if len(line) > 4:
-                line[4] = line[4].replace("\n", "")
-            text.append(line)
-        datas.update({str(round(file/fps,2)) + "s": text})
-        count = count + 1
-        f.close
-    return datas #輸出資料夾
-
-def anxiety_status(datas):
-    tmp = 0.0
-    for data in datas:
-        time = data.split(".")[0]
-        if float(datas[data][0][2]) > 0.8:
-            print(str(data) + ":" + "沉底")
+    def anxiety_status(datas):
+        tmp = 0.0
+        for data in datas:
+            time = data.split(".")[0]
+            if float(datas[data][0][2]) > 0.8:
+                print(str(data) + ":" + "沉底")
 
 if __name__ == '__main__':
 
@@ -104,12 +115,12 @@ if __name__ == '__main__':
     app.exec_()
 
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mp4Name", type=str, help='file_name1') #輸入mp4檔案取得fps
-    parser.add_argument("coordinateFolder", type=str, help='file_name2') #輸入座標資料夾
-    args = parser.parse_args()
-    mp4Name = args.mp4Name
-    coordinateFolder = args.coordinateFolder
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("mp4Name", type=str, help='file_name1') #輸入mp4檔案取得fps
+    # parser.add_argument("coordinateFolder", type=str, help='file_name2') #輸入座標資料夾
+    # args = parser.parse_args()
+    # mp4Name = args.mp4Name
+    # coordinateFolder = args.coordinateFolder
 
     datas = datas_handle(mp4Name, coordinateFolder)
     anxiety_status(datas)
