@@ -119,7 +119,6 @@ class App(QWidget):
             self.labelTwo.setGeometry(70, 170, 300, 50)
 
 
-    
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
