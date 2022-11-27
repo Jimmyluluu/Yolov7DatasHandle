@@ -125,4 +125,3 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     UIWindow = App()
     app.exec_()
-
