@@ -7,7 +7,6 @@ This script to analyze fish tracks
 ```
 pip3 install -r requirements.txt
 ```
-
 ### Run the script
 ```
 python3 fishStatusTool.py
